@@ -2,21 +2,37 @@ import express from 'express';
 import cors from 'cors';
 import { appendTask, appendTodo, clearTask, clearTasks, clearTodo, clearTodos, getTasks, getTodos } from '../lib/todo.js';
 import path from 'path'
-import { sqlite3 } from 'sqlite3';
-sqlite3.verbose();
+import sqlite3 from 'sqlite3';
+
+//db instance
+var db = new sqlite3.Database('./todo.db');
+
+db.serialize(function () {
+  db.run("CREATE TABLE lorem (info TEXT)");
+  
+  var stmt = db.prepare("INSERT INTO lorem VALUES (?)");
+  for(var i = 0; i < 10; i++) {
+    stmt.run("Impsum " + i);
+  }
+  
+  stmt.finalize();
+  
+  db.each("SELECT rowid AS id, info FROM lorem", function(err, row) {
+    console.log(row.id + ": " + row.info);
+  })
+});
+
+db.close();
+
 const app = express();
 
 // allow cross origin
 app.use(cors());
 
-//db instance
-var db = new sqlite3.Database(':memory:');
 
 // enable POST as json
 app.use(express.json());
 app.use(express.urlencoded({extended: true}));
-
-
 
 /**
  * TASK:
