@@ -2,14 +2,20 @@ import express from 'express';
 import cors from 'cors';
 import { appendTask, appendTodo, clearTask, clearTasks, clearTodo, clearTodos, getTasks, getTodos } from '../lib/todo.js';
 import path from 'path'
+import { sqlite3 } from 'sqlite3';
+sqlite3.verbose();
 const app = express();
 
 // allow cross origin
 app.use(cors());
 
+//db instance
+var db = new sqlite3.Database(':memory:');
+
 // enable POST as json
 app.use(express.json());
 app.use(express.urlencoded({extended: true}));
+
 
 
 /**
